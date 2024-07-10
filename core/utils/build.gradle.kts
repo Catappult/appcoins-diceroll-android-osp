@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-  namespace = "com.appcoins.diceroll.core.utils"
+  namespace = "com.appcoins.diceroll.osp.core.utils"
   buildFeatures {
     buildConfig = true
   }

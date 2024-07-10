@@ -1,11 +1,11 @@
-import com.appcoins.diceroll.convention.extensions.projectImplementation
+import com.appcoins.diceroll.osp.convention.extensions.projectImplementation
 
 plugins {
   id("diceroll.android.library.compose")
 }
 
 android {
-  namespace = "com.appcoins.diceroll.payments.appcoins_osp"
+  namespace = "com.appcoins.diceroll.osp.payments.appcoins_osp"
 }
 
 dependencies {
