@@ -8,7 +8,7 @@
 
 ## 💻 About
 
-This sample app is used to show the integration via One-Step-Payment of the AppCoins Billing System.
+This sample app is used to show the integration via [One-Step-Payment](https://docs.catappult.io/docs/one-step-payment) of the AppCoins Billing System.
 
 > This sample app is still under development and some features might be imcomplete for now.
 
