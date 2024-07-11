@@ -1,6 +1,9 @@
 package com.appcoins.diceroll.osp.feature.settings.ui
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +36,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appcoins.diceroll.osp.core.utils.R
+import com.appcoins.diceroll.osp.core.utils.diceRollPackage
+import com.appcoins.diceroll.osp.core.utils.extensions.getInstallerInfo
 import com.appcoins.diceroll.osp.feature.settings.data.model.ThemeConfig
 import com.appcoins.diceroll.osp.feature.settings.data.model.UserPrefs
 import com.appcoins.diceroll.osp.feature.settings.ui.SettingsUiState.Loading
@@ -43,9 +49,11 @@ fun SettingsRoute(
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
   val settingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val deeplinkUiState by viewModel.storeDeeplinkState.collectAsStateWithLifecycle()
   SettingsDialog(
     onDismiss = onDismiss,
     settingsUiState = settingsUiState,
+    deepLinkUiState = deeplinkUiState,
     viewModel = viewModel,
   )
 }
@@ -53,6 +61,7 @@ fun SettingsRoute(
 @Composable
 fun SettingsDialog(
   settingsUiState: SettingsUiState,
+  deepLinkUiState: StoreDeeplinkUiState,
   onDismiss: () -> Unit,
   viewModel: SettingsViewModel,
 ) {
@@ -68,8 +77,22 @@ fun SettingsDialog(
     },
     text = {
       HorizontalDivider()
+      checkForInstaller(
+        context = LocalContext.current,
+        getUpdateDeeplink = viewModel::getUpdateDeeplink,
+        viewModel.shouldLaunchDeeplink
+      )
       Column(Modifier.verticalScroll(rememberScrollState())) {
-        ShowUpdateInformation()
+        when (deepLinkUiState) {
+          StoreDeeplinkUiState.Loading -> {}
+          StoreDeeplinkUiState.Error -> {}
+          is StoreDeeplinkUiState.Success -> {
+            ShowUpdateInformation(
+              deeplink = deepLinkUiState.storeDeeplinkUrl,
+              shouldLaunchDeeplink = viewModel.shouldLaunchDeeplink,
+            )
+          }
+        }
         when (settingsUiState) {
           Loading -> {
             Text(
@@ -99,22 +122,54 @@ fun SettingsDialog(
   )
 }
 
+private fun checkForInstaller(
+  context: Context,
+  getUpdateDeeplink: (appPackage: String, storePackage: String?) -> Unit,
+  shouldLaunchDeeplink: MutableState<Boolean>
+) {
+  shouldLaunchDeeplink.value = true
+  getUpdateDeeplink(diceRollPackage, context.packageManager.getInstallerInfo())
+}
+
 @Composable
-fun ShowUpdateInformation() {
+fun ShowUpdateInformation(deeplink: String, shouldLaunchDeeplink: MutableState<Boolean>) {
   val context = LocalContext.current
   Text(
     text = stringResource(id = com.appcoins.diceroll.osp.core.ui.design.R.string.check_for_updates_title),
     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
   )
   Button(onClick = {
-    launchAppUpdateDialog(context)
+    launchDeeplink(
+      context = context,
+      deeplink = deeplink,
+      shouldLaunchDeeplink = shouldLaunchDeeplink
+    )
   }) {
     Text(text = stringResource(id = com.appcoins.diceroll.osp.core.ui.design.R.string.check_for_updates_button))
   }
 }
 
-private fun launchAppUpdateDialog(context: Context) {
-  // TODO Add OSP App Update Logic
+fun launchDeeplink(
+  deeplink: String,
+  shouldLaunchDeeplink: MutableState<Boolean>,
+  context: Context
+) {
+  if (shouldLaunchDeeplink.value) {
+    shouldLaunchDeeplink.value = false
+    val deeplinkIntent = Intent(Intent.ACTION_VIEW, Uri.parse(deeplink)).apply {
+      addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+      context.packageManager.getInstallerInfo()?.let {
+        `package` = it
+      }
+    }
+
+    try {
+      context.startActivity(deeplinkIntent)
+    } catch (e: ActivityNotFoundException) {
+      e.printStackTrace()
+    }
+  }
 }
 
 @Composable
