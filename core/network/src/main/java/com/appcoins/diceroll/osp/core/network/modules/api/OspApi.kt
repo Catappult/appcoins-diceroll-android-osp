@@ -9,7 +9,7 @@ interface OspApi {
 
   @GET("osp_url/{product}")
   suspend fun getOspUrl(
-    @Path("product") product: String,
+    @Path("product") product: String
   ): OspUrlResponse
 
   @GET("callback_result/{order_reference}")
