@@ -9,7 +9,9 @@ android {
 }
 
 dependencies {
+  projectImplementation(":core:datastore")
   projectImplementation(":core:network")
   projectImplementation(":core:utils")
+  implementation(libs.androidx.datastore.preferences)
   implementation(libs.network.retrofit)
 }
