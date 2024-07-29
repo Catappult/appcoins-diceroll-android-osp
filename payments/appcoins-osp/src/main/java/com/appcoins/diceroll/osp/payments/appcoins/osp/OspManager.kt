@@ -39,7 +39,9 @@ class OspManager @Inject constructor(
 
     fun startPayment(context: Context, product: String, callback: OspLaunchCallback) {
         CoroutineScope(Dispatchers.IO).launch {
-            ospRepository.getOspUrl(product)
+            val oemId = attributionDataSource.getOemId()
+            val guestUid = attributionDataSource.getGuestUid()
+            ospRepository.getOspUrl(product, oemId, guestUid)
                 .onSuccess { ospUrl ->
                     openPaymentActivity(
                         ospUrl = ospUrl.url,
@@ -54,20 +56,14 @@ class OspManager @Inject constructor(
         }
     }
 
-    private suspend fun openPaymentActivity(
+    private fun openPaymentActivity(
         ospUrl: String,
         ospOrderReference: String,
         context: Context,
         callback: OspLaunchCallback
     ) {
         runCatching {
-            val oemId = attributionDataSource.getOemId()
-            val guestUid = attributionDataSource.getGuestUid()
-
-            val urlWithAttribution =
-                ospUrl + createOemIdQuery(oemId) + createGuestUidQuery(guestUid)
-
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlWithAttribution)).apply {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ospUrl)).apply {
                 getSupportedServicePackage(context, ospUrl)?.let { packageName ->
                     setPackage(packageName)
                 }
@@ -79,12 +75,6 @@ class OspManager @Inject constructor(
             callback.onError(error = Result.failure(it))
         }
     }
-
-    private fun createOemIdQuery(oemId: String?): String =
-        oemId?.let { "&oemid=$it" } ?: ""
-
-    private fun createGuestUidQuery(guestUid: String?): String =
-        guestUid?.let { "&guestWalletId=$it" } ?: ""
 
     private fun getSupportedServicePackage(context: Context, ospUrl: String): String? {
         val packageManager = (context as Activity).packageManager

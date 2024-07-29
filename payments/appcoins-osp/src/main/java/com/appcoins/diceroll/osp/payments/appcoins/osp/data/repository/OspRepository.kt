@@ -14,10 +14,10 @@ class OspRepository @Inject constructor(
   private val ospApi: OspApi,
 ) {
 
-  suspend fun getOspUrl(product: String): Result<OspUrl> {
+  suspend fun getOspUrl(product: String, oemid: String?, guestUid: String?): Result<OspUrl> {
     return runCatching {
       withContext(Dispatchers.IO) {
-        ospApi.getOspUrl(product = product).toOspUrl()
+        ospApi.getOspUrl(product, oemid, guestUid).toOspUrl()
       }
     }
   }
