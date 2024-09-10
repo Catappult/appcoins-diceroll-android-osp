@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import com.appcoins.diceroll.osp.core.utils.aptoideGamesPackage
 import com.appcoins.diceroll.osp.core.utils.gamesHubPackage
 import com.appcoins.diceroll.osp.core.utils.walletPackage
 import com.appcoins.diceroll.osp.payments.appcoins.osp.data.repository.OspRepository
@@ -55,7 +56,7 @@ class OspManager @Inject constructor(private val ospRepository: OspRepository) {
 
   private fun getSupportedServicePackage(context: Context, ospUrl: String): String? {
     val packageManager = (context as Activity).packageManager
-    val packagesToCheck = listOf(walletPackage, gamesHubPackage)
+    val packagesToCheck = listOf(walletPackage, aptoideGamesPackage, gamesHubPackage)
     return packagesToCheck.find { packageName ->
       val isPackageInstalled = runCatching {
         packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
