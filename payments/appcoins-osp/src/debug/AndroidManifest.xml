@@ -6,6 +6,7 @@
             <action android:name="android.intent.action.VIEW" />
         </intent>
         <package android:name="com.appcoins.wallet.dev" />
+        <package android:name="com.aptoide.android.aptoidegames.dev" />
         <package android:name="com.dti.hub.stg" />
         <package android:name="com.dti.hub.dev" />
     </queries>
