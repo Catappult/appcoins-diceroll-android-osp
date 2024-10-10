@@ -5,4 +5,3 @@ const val storeDeepLinkUrl = "https://store-link-mapper.aptoide.com"
 
 val diceRollPackage = if(BuildConfig.DEBUG) "com.appcoins.diceroll.osp.dev" else "com.appcoins.diceroll.osp"
 val walletPackage = if(BuildConfig.DEBUG) "com.appcoins.wallet.dev" else "com.appcoins.wallet"
-val gamesHubPackage = if(BuildConfig.DEBUG) "com.dti.hub.stg" else "com.dti.folderlauncher"
