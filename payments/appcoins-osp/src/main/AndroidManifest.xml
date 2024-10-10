@@ -6,6 +6,7 @@
             <action android:name="android.intent.action.VIEW" />
         </intent>
         <package android:name="com.appcoins.wallet" />
+        <package android:name="com.aptoide.android.aptoidegames" />
         <package android:name="com.dti.folderlauncher" />
     </queries>
 </manifest>
