@@ -8,8 +8,8 @@ android {
   namespace = "com.appcoins.diceroll.osp"
   defaultConfig {
     applicationId = "com.appcoins.diceroll.osp"
-    versionCode = 16
-    versionName = "0.4.9"
+    versionCode = 18
+    versionName = "0.4.11"
     multiDexEnabled = true
   }
 }
